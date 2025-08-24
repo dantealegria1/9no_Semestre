@@ -10,8 +10,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: "pip"
+          python-version: "3.11"   # ← sin cache para evitar el warning
 
       - name: Install deps (pdoc)
         run: |
@@ -19,12 +18,22 @@ jobs:
           pip install pdoc
 
       - name: Generate HTML docs (pdoc)
+        shell: bash
         run: |
+          set -e
           mkdir -p build/docs
-          # Buscar todos los .py y generar docs solo si no existen ya
-          for file in $(git ls-files '*.py'); do
-            module_name=$(basename "$file" .py)
-            target_dir="build/docs/$module_name"
+
+          # Listar todos los .py del repo excluyendo entornos y tests
+          mapfile -t pyfiles < <(git ls-files '*.py' | grep -Ev '^(\.venv|venv|env|tests)/')
+          if [ ${#pyfiles[@]} -eq 0 ]; then
+            echo "[INFO] No se encontraron archivos .py para documentar."
+            exit 0
+          fi
+
+          # Generar docs por archivo (evita fallos por imports no resueltos)
+          for file in "${pyfiles[@]}"; do
+            module_name="$(basename "$file" .py)"
+            target_dir="build/docs/${module_name}"
             if [ ! -d "$target_dir" ]; then
               echo "[INFO] Generando docs para $file"
               pdoc --html "$file" -o build/docs --force
