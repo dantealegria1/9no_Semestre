@@ -19,5 +19,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint
     - name: Analysing the code with pylint
-      run: |
-        pylint $(git ls-files '*.py')
+  run: |
+    score=$(pylint $(git ls-files '*.py') --score=y --exit-zero | tee pylint.log | grep "Your code has been rated" | awk '{print $7}' | cut -d'/' -f1)
+    echo "Pylint score: $score"
+    # Compara la nota, exige >9
+    if (( $(echo "$score < 9.0" | bc -l) )); then
+      echo "❌ Pylint score too low: $score"
+      exit 1
+    else
+      echo "✅ Pylint score is good: $score"
+    fi
+
