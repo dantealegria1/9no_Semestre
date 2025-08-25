@@ -6,6 +6,9 @@
 #           un archivo .txt usando el método Atbash.
 # ===================================
 
+"""
+Constantes globales
+"""
 FILE_PATH = "alphabet.txt"
 TEXT = "SVOOL SLD ZIV F"
 
