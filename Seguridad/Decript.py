@@ -92,7 +92,12 @@ def main():
     - Permite pasar textos cifrados desde argumentos o input.
     - Si no se pasa nada, usa los valores por defecto.
     """
-    alphabet = read_alphabet(FILE_PATH)
+    file_path = input("Introduce la ruta del archivo de alfabeto (Enter para usar 'alphabet.txt'): ").strip()
+    if not file_path:
+        print("Usando archivo por defecto 'alphabet.txt'.")
+        file_path = "alphabet.txt"
+
+    alphabet = read_alphabet(file_path)
 
     # Texto Atbash: desde argumento, input o default
     if len(sys.argv) > 1:
@@ -101,7 +106,7 @@ def main():
         entrada = input("Introduce texto Atbash (Enter para usar default): ").strip()
         ciphertext_atbash = entrada.upper() if entrada else TEXT
 
-    # Texto César: desde argumento, input o default
+    # Texto César: desde argumento, input o defaults
     if len(sys.argv) > 2:
         ciphertext_cesar = sys.argv[2].upper()
     else:
