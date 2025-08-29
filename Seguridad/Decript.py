@@ -52,39 +52,37 @@ def atbash_decrypt(ciphertext: str, alphabet: str) -> str:
     return ciphertext.translate(translation_table)       # Traducción carácter por carácter
 
 
-def cesar_decrypt(text: str, shift: int) -> str:
+def cesar_decrypt(text: str, shift: int, alphabet: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ") -> str:
     """
-    Descifra un mensaje usando el método César.
+    Descifra un mensaje usando el método César con un alfabeto configurable.
     
-    Funcionamiento:
-    - El texto cifrado fue creado desplazando cada letra hacia adelante `shift` posiciones.
-    - Para descifrar, retrocedemos `shift` posiciones en el alfabeto.
-    
-    Ejemplo (shift = 3):
-    Texto original : HELLO
-    Texto cifrado  : KHOOR
-    
-    Lógica:
-    - Recorremos cada carácter:
-      - Si es letra: convertimos a código ASCII con `ord(char)`,
-        restamos la base (`A` o `a` según mayúscula/minúscula),
-        aplicamos la fórmula `(posicion - shift) % 26`
-        y volvemos a letra con `chr`.
-      - Si no es letra (espacios, números, signos), lo dejamos igual.
+    - Usa el alfabeto proporcionado (por defecto A-Z, 26 letras).
+    - El % len(alphabet) asegura que el corrimiento sea circular según el tamaño del alfabeto.
     """
     result = ""
+    n = len(alphabet)  # tamaño del alfabeto
+    alphabet_lower = alphabet.lower()
+
     for char in text:
-        if char.isalpha():  
-            # Determinar si es mayúscula o minúscula
-            base = ord('A') if char.isupper() else ord('a')
-            
-            # Aplicar el corrimiento inverso (retroceder posiciones)
-            new_char = chr((ord(char) - base - shift) % 26 + base)
-            result += new_char
+        if char.isalpha():
+            if char.isupper():
+                pos = alphabet.index(char) if char in alphabet else -1
+                if pos != -1:
+                    new_pos = (pos - shift) % n
+                    result += alphabet[new_pos]
+                else:
+                    result += char
+            else:  # minúsculas
+                pos = alphabet_lower.index(char) if char in alphabet_lower else -1
+                if pos != -1:
+                    new_pos = (pos - shift) % n
+                    result += alphabet_lower[new_pos]
+                else:
+                    result += char
         else:
-            # Mantener espacios, signos, etc.
             result += char
     return result
+
 
 
 def main():
